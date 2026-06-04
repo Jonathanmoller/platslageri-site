@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <nav className="border-b bg-white">
+    <nav className="border-b">
       <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link
           href="/"
