@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import AdminUpload from "@/components/AdminUpload";
+import AdminJobsList from "@/components/AdminJobsList";
 
 export default async function Admin() {
   const supabase = await createClient();
@@ -15,11 +16,9 @@ export default async function Admin() {
 
   return (
     <div className="max-w-xl mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-6">
-        Admin
-      </h1>
-
+      <h1 className="text-2xl font-bold mb-6">Admin</h1>
       <AdminUpload />
+      <AdminJobsList />
     </div>
   );
 }
