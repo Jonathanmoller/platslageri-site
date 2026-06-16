@@ -1,4 +1,5 @@
 import Hero from "@/components/Hero";
+import LatestJobs from "@/components/LatestJobs";
 
 export default function Home() {
   return (
@@ -44,6 +45,7 @@ export default function Home() {
             </p>
           </div>
         </div>
+        <LatestJobs />
       </section>
     </>
   );
