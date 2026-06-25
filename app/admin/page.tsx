@@ -15,8 +15,14 @@ export default async function Admin() {
   }
 
   return (
-    <div className="max-w-xl mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-6">Admin</h1>
+    <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Admin</h1>
+        <p className="mt-2 text-muted">
+          Hantera projekt, bilder och innehåll för hemsidan.
+        </p>
+      </div>
+
       <AdminUpload />
       <AdminJobsList />
     </div>

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 type JobPageProps = {
   params: Promise<{
@@ -11,7 +12,6 @@ export default async function JobPage({ params }: JobPageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  // Hämta själva jobbet
   const { data: job, error: jobError } = await supabase
     .from("jobs")
     .select("*")
@@ -22,7 +22,6 @@ export default async function JobPage({ params }: JobPageProps) {
     notFound();
   }
 
-  // Hämta extra bilder till jobbet
   const { data: extraImages, error: imagesError } = await supabase
     .from("job_images")
     .select("*")
@@ -34,51 +33,62 @@ export default async function JobPage({ params }: JobPageProps) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-bold mb-4">{job.title}</h1>
+    <div className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mb-8">
+        <Link
+          href="/gallery"
+          className="mb-4 inline-block font-medium text-primary hover:underline"
+        >
+          ← Tillbaka till galleri
+        </Link>
 
-      {job.description && (
-        <p className="text-lg text-gray-700 mb-8">{job.description}</p>
-      )}
+        <h1 className="mb-4 text-4xl font-bold text-foreground">{job.title}</h1>
 
-      {/* Huvudbild från jobs-tabellen */}
+        {job.description && (
+          <p className="max-w-3xl text-lg text-muted">{job.description}</p>
+        )}
+      </div>
+
       {job.image_url && (
-        <div className="mb-12">
+        <div className="mb-12 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           <img
             src={job.image_url}
             alt={job.title}
-            className="w-full max-h-[500px] object-cover rounded-lg shadow"
+            className="max-h-[520px] w-full object-cover"
           />
         </div>
       )}
 
-      {/* Extra bilder */}
       <section>
-        <h2 className="text-2xl font-bold mb-6">Bilder från projektet</h2>
+        <h2 className="mb-6 text-2xl font-bold text-foreground">
+          Bilder från projektet
+        </h2>
 
         {extraImages && extraImages.length > 0 ? (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid gap-6 md:grid-cols-2">
             {extraImages.map((image) => (
               <div
                 key={image.id}
-                className="bg-white border rounded-lg overflow-hidden shadow-sm"
+                className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm"
               >
                 <img
                   src={image.image_url}
                   alt={image.caption ?? job.title}
-                  className="w-full h-72 object-cover"
+                  className="h-72 w-full object-cover"
                 />
 
-                {image.caption && (
-                  <div className="p-4">
-                    <p className="text-gray-700">{image.caption}</p>
-                  </div>
-                )}
+                <div className="p-4">
+                  <p className="text-muted">
+                    {image.caption || "Ingen bildtext"}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">Inga extra bilder uppladdade ännu.</p>
+          <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <p className="text-muted">Inga extra bilder uppladdade ännu.</p>
+          </div>
         )}
       </section>
     </div>

@@ -24,12 +24,12 @@ export default function AdminJobsList() {
       .from("jobs")
       .select(
         `
-      id,
-      title,
-      description,
-      image_url,
-      job_images ( id )
-    `,
+          id,
+          title,
+          description,
+          image_url,
+          job_images ( id )
+        `,
       )
       .order("created_at", { ascending: false });
 
@@ -51,6 +51,7 @@ export default function AdminJobsList() {
     );
 
     if (!confirmed) return;
+
     const { error } = await supabase.from("jobs").delete().eq("id", id);
 
     if (error) {
@@ -59,7 +60,7 @@ export default function AdminJobsList() {
       return;
     }
 
-    loadJobs();
+    await loadJobs();
   };
 
   const handleEdit = (id: string, title: string, description: string) => {
@@ -86,44 +87,48 @@ export default function AdminJobsList() {
     }
 
     setEditingJobId(null);
+    setEditTitle("");
+    setEditDescription("");
 
     await loadJobs();
   };
 
   return (
     <div className="mt-10">
-      <h2 className="text-xl font-bold mb-4">Befintliga jobb</h2>
+      <h2 className="mb-4 text-xl font-bold text-foreground">
+        Befintliga jobb
+      </h2>
 
       {jobs.map((job) => (
         <div
           key={job.id}
-          className="border rounded-xl p-4 mb-6 bg-white shadow-sm"
+          className="mb-6 rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm"
         >
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Bild */}
+          <div className="flex flex-col gap-4 md:flex-row">
             <div className="shrink-0">
               {job.image_url ? (
                 <img
                   src={job.image_url}
                   alt={job.title}
-                  className="w-full md:w-40 h-40 object-cover rounded-lg"
+                  className="h-40 w-full rounded-lg object-cover md:w-40"
                 />
               ) : (
-                <div className="w-full md:w-40 h-40 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-500">
+                <div className="flex h-40 w-full items-center justify-center rounded-lg border border-border bg-background text-sm text-muted md:w-40">
                   Ingen bild
                 </div>
               )}
             </div>
 
-            {/* Innehåll */}
             <div className="flex-1">
-              <h3 className="text-xl font-bold mb-2">{job.title}</h3>
+              <h3 className="mb-2 text-xl font-bold text-card-foreground">
+                {job.title}
+              </h3>
 
-              <p className="text-gray-600 mb-3">
+              <p className="mb-3 text-muted">
                 {job.description || "Ingen beskrivning"}
               </p>
 
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="mb-4 text-sm text-muted">
                 Extra bilder: {job.job_images?.length ?? 0}
               </p>
 
@@ -132,14 +137,14 @@ export default function AdminJobsList() {
                   onClick={() =>
                     handleEdit(job.id, job.title, job.description ?? "")
                   }
-                  className="bg-blue-600 px-4 py-2 rounded"
+                  className="rounded bg-primary px-4 py-2 text-primary-foreground"
                 >
                   Redigera
                 </button>
 
                 <button
                   onClick={() => handleDelete(job.id)}
-                  className="bg-red-500 px-4 py-2 rounded"
+                  className="rounded bg-danger px-4 py-2 text-danger-foreground"
                 >
                   Ta bort
                 </button>
@@ -148,39 +153,52 @@ export default function AdminJobsList() {
                   onClick={() =>
                     setExpandedJobId(expandedJobId === job.id ? null : job.id)
                   }
-                  className="bg-slate-700 px-4 py-2 rounded"
+                  className="rounded bg-secondary px-4 py-2 text-secondary-foreground"
                 >
                   {expandedJobId === job.id ? "Dölj bilder" : "Hantera bilder"}
                 </button>
               </div>
 
-              {/* Edit-formulär */}
               {editingJobId === job.id && (
-                <div className="mt-4 space-y-2">
-                  <input
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className="border p-2 w-full rounded"
-                  />
+                <div className="mt-4 space-y-3 rounded-lg border border-border bg-background p-4">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
+                      Titel
+                    </label>
+                    <input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full rounded border border-border bg-card px-3 py-2 text-foreground"
+                    />
+                  </div>
 
-                  <textarea
-                    value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                    className="border p-2 w-full rounded"
-                    rows={4}
-                  />
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">
+                      Beskrivning
+                    </label>
+                    <textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      className="w-full rounded border border-border bg-card px-3 py-2 text-foreground"
+                      rows={4}
+                    />
+                  </div>
 
                   <div className="flex gap-2">
                     <button
                       onClick={handleUpdate}
-                      className="bg-green-600 px-4 py-2 rounded"
+                      className="rounded bg-primary px-4 py-2 text-primary-foreground"
                     >
                       Spara
                     </button>
 
                     <button
-                      onClick={() => setEditingJobId(null)}
-                      className="bg-gray-500 px-4 py-2 rounded"
+                      onClick={() => {
+                        setEditingJobId(null);
+                        setEditTitle("");
+                        setEditDescription("");
+                      }}
+                      className="rounded bg-secondary px-4 py-2 text-secondary-foreground"
                     >
                       Avbryt
                     </button>
@@ -188,7 +206,6 @@ export default function AdminJobsList() {
                 </div>
               )}
 
-              {/* Bildhantering */}
               {expandedJobId === job.id && <JobImagesManager jobId={job.id} />}
             </div>
           </div>

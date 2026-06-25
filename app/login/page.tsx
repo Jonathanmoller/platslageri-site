@@ -7,49 +7,78 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    if (!email.trim() || !password.trim()) {
+      alert("Fyll i både e-post och lösenord");
+      return;
+    }
 
-  console.log("LOGIN:", data, error);
+    setLoading(true);
 
-  if (error) {
-    alert("Fel login");
-    return;
-  }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  router.refresh();
-  router.push("/admin");
-};
+    if (error) {
+      alert("Fel login");
+      setLoading(false);
+      return;
+    }
+
+    router.push("/admin");
+    router.refresh();
+  };
 
   return (
-    <div className="max-w-md mx-auto mt-20">
-      <h1 className="text-2xl font-bold mb-6">Logga in</h1>
+    <div className="mx-auto max-w-md px-6 py-20">
+      <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-card-foreground">Logga in</h1>
+          <p className="mt-2 text-sm text-muted">
+            Logga in för att hantera projekt och bilder på hemsidan.
+          </p>
+        </div>
 
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 w-full mb-4"
-      />
+        <div className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-foreground">
+              E-post
+            </label>
+            <input
+              type="email"
+              placeholder="din@email.se"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded border border-border bg-background px-3 py-2 text-foreground"
+            />
+          </div>
 
-      <input
-        type="password"
-        placeholder="Lösenord"
-        onChange={(e) => setPassword(e.target.value)}
-        className="border p-2 w-full mb-4"
-      />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-foreground">
+              Lösenord
+            </label>
+            <input
+              type="password"
+              placeholder="Lösenord"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded border border-border bg-background px-3 py-2 text-foreground"
+            />
+          </div>
 
-      <button
-        onClick={handleLogin}
-        className="bg-blue-500 text-white px-4 py-2 rounded w-full"
-      >
-        Logga in
-      </button>
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
+          >
+            {loading ? "Loggar in..." : "Logga in"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

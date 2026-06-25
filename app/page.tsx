@@ -6,47 +6,52 @@ export default function Home() {
     <>
       <Hero />
 
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold mb-10">
-          Våra tjänster
-        </h2>
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10">
+          <h2 className="text-3xl font-bold text-foreground">Våra tjänster</h2>
+          <p className="mt-2 text-muted">
+            Vi utför plåtarbeten för tak, fasader och detaljer runt huset –
+            alltid med fokus på hållbara lösningar och ett snyggt slutresultat.
+          </p>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold text-xl mb-2">
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <h3 className="mb-2 text-xl font-bold text-card-foreground">
               Takarbeten
             </h3>
 
-            <p>
-              Takplåt, skorstensbeslag och
-              specialanpassade lösningar.
+            <p className="text-muted">
+              Takplåt, skorstensbeslag och specialanpassade lösningar för både
+              renovering och nyproduktion.
             </p>
           </div>
 
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold text-xl mb-2">
+          <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <h3 className="mb-2 text-xl font-bold text-card-foreground">
               Fasadarbeten
             </h3>
 
-            <p>
-              Plåtdetaljer och fasadlösningar
-              för både privatpersoner och företag.
+            <p className="text-muted">
+              Plåtdetaljer och fasadlösningar för både privatpersoner och
+              företag, anpassade efter byggnadens behov.
             </p>
           </div>
 
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold text-xl mb-2">
+          <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <h3 className="mb-2 text-xl font-bold text-card-foreground">
               Hängrännor & beslag
             </h3>
 
-            <p>
-              Montering och tillverkning av
-              hängrännor, stuprör och beslag.
+            <p className="text-muted">
+              Montering och tillverkning av hängrännor, stuprör, beslag och
+              andra viktiga detaljer för ett hållbart resultat.
             </p>
           </div>
         </div>
-        <LatestJobs />
       </section>
+
+      <LatestJobs />
     </>
   );
 }
