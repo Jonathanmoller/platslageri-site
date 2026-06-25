@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import Link from "next/link";
 
 //export const revalidate = 60; //for prod.
 export const dynamic = "force-dynamic"; //for development.
@@ -21,18 +22,21 @@ export default async function Gallery() {
 
       <div className="grid md:grid-cols-3 gap-6">
         {jobs?.map((job) => (
-          <div key={job.id} className="bg-white shadow rounded overflow-hidden">
+          <Link
+            key={job.id}
+            href={`/jobs/${job.id}`}
+            className="bg-white shadow rounded overflow-hidden block hover:shadow-lg transition"
+          >
             <img
               src={job.image_url}
               alt={job.title}
               className="w-full h-48 object-cover"
             />
-
             <div className="p-4">
               <h3 className="font-bold">{job.title}</h3>
               <p className="text-sm text-gray-600">{job.description}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
