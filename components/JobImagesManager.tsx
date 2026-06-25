@@ -48,7 +48,6 @@ export default function JobImagesManager({ jobId }: JobImagesManagerProps) {
 
     const fileName = `${jobId}/${Date.now()}-${file.name}`;
 
-    // 1. Upload till Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from("jobs")
       .upload(fileName, file);
@@ -60,14 +59,12 @@ export default function JobImagesManager({ jobId }: JobImagesManagerProps) {
       return;
     }
 
-    // 2. Hämta public URL
     const { data: publicUrlData } = supabase.storage
       .from("jobs")
       .getPublicUrl(fileName);
 
     const imageUrl = publicUrlData.publicUrl;
 
-    // 3. Spara i job_images
     const { error: insertError } = await supabase.from("job_images").insert([
       {
         job_id: jobId,
@@ -112,59 +109,61 @@ export default function JobImagesManager({ jobId }: JobImagesManagerProps) {
   };
 
   return (
-    <div className="mt-4 border-t pt-4">
-      <h4 className="font-bold mb-3">Extra bilder</h4>
+    <div className="mt-6 border-t border-border pt-6">
+      <h4 className="mb-4 text-lg font-bold text-foreground">Extra bilder</h4>
 
-      <div className="space-y-3 mb-6">
-        <input
-          type="file"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="block"
-        />
+      <div className="mb-6 rounded-lg border border-border bg-background p-4">
+        <div className="space-y-3">
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className="block w-full text-sm text-foreground file:mr-4 file:rounded file:border-0 file:bg-secondary file:px-4 file:py-2 file:text-secondary-foreground"
+          />
 
-        <input
-          type="text"
-          placeholder="Bildtext, t.ex. Före arbetet"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          className="border p-2 w-full"
-        />
+          <input
+            type="text"
+            placeholder="Bildtext, t.ex. Före arbetet"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            className="w-full rounded border border-border bg-card px-3 py-2 text-foreground"
+          />
 
-        <button
-          onClick={handleUpload}
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          {loading ? "Laddar upp..." : "Ladda upp bild"}
-        </button>
+          <button
+            onClick={handleUpload}
+            disabled={loading}
+            className="rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
+          >
+            {loading ? "Laddar upp..." : "Ladda upp bild"}
+          </button>
+        </div>
       </div>
 
       <div className="space-y-4">
         {images.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted">
             Inga extra bilder uppladdade ännu.
           </p>
         ) : (
           images.map((image) => (
             <div
               key={image.id}
-              className="border rounded p-3 flex gap-4 items-center"
+              className="flex items-center gap-4 rounded-lg border border-border bg-card p-3 text-card-foreground"
             >
               <img
                 src={image.image_url}
                 alt={image.caption ?? "Jobbbild"}
-                className="w-24 h-24 object-cover rounded"
+                className="h-24 w-24 rounded object-cover"
               />
 
               <div className="flex-1">
-                <p className="font-medium">
+                <p className="font-medium text-card-foreground">
                   {image.caption || "Ingen bildtext"}
                 </p>
               </div>
 
               <button
                 onClick={() => handleDelete(image.id)}
-                className="bg-red-500 text-white px-3 py-2 rounded"
+                className="rounded bg-danger px-3 py-2 text-danger-foreground"
               >
                 Ta bort
               </button>
