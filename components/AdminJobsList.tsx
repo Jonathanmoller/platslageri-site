@@ -4,18 +4,39 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import JobImagesManager from "@/components/JobImagesManager";
 
+type Job = {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  job_images?: { id: string }[];
+};
+
 export default function AdminJobsList() {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [editingJobId, setEditingJobId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
   async function loadJobs() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("jobs")
-      .select("*")
+      .select(
+        `
+      id,
+      title,
+      description,
+      image_url,
+      job_images ( id )
+    `,
+      )
       .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading jobs:", error);
+      return;
+    }
 
     setJobs(data ?? []);
   }
@@ -76,72 +97,101 @@ export default function AdminJobsList() {
       {jobs.map((job) => (
         <div
           key={job.id}
-          className="border rounded p-4 mb-4 flex gap-4 items-center"
+          className="border rounded-xl p-4 mb-6 bg-white shadow-sm"
         >
-          <img
-            src={job.image_url}
-            alt={job.title}
-            className="w-24 h-24 object-cover rounded"
-          />
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Bild */}
+            <div className="shrink-0">
+              {job.image_url ? (
+                <img
+                  src={job.image_url}
+                  alt={job.title}
+                  className="w-full md:w-40 h-40 object-cover rounded-lg"
+                />
+              ) : (
+                <div className="w-full md:w-40 h-40 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-500">
+                  Ingen bild
+                </div>
+              )}
+            </div>
 
-          <div className="flex-1">
-            <h3 className="font-bold">{job.title}</h3>
+            {/* Innehåll */}
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-2">{job.title}</h3>
 
-            <p className="text-sm text-gray-600">{job.description}</p>
-          </div>
-          {expandedJobId === job.id && <JobImagesManager jobId={job.id} />}
-          {editingJobId === job.id && (
-            <div className="mt-4 space-y-2">
-              <input
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                className="border p-2 w-full"
-              />
+              <p className="text-gray-600 mb-3">
+                {job.description || "Ingen beskrivning"}
+              </p>
 
-              <textarea
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                className="border p-2 w-full"
-              />
+              <p className="text-sm text-gray-500 mb-4">
+                Extra bilder: {job.job_images?.length ?? 0}
+              </p>
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
-                  onClick={handleUpdate}
-                  className="bg-green-600 text-white px-4 py-2 rounded"
+                  onClick={() =>
+                    handleEdit(job.id, job.title, job.description ?? "")
+                  }
+                  className="bg-blue-600 px-4 py-2 rounded"
                 >
-                  Spara
+                  Redigera
                 </button>
 
                 <button
-                  onClick={() => setEditingJobId(null)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={() => handleDelete(job.id)}
+                  className="bg-red-500 px-4 py-2 rounded"
                 >
-                  Avbryt
+                  Ta bort
+                </button>
+
+                <button
+                  onClick={() =>
+                    setExpandedJobId(expandedJobId === job.id ? null : job.id)
+                  }
+                  className="bg-slate-700 px-4 py-2 rounded"
+                >
+                  {expandedJobId === job.id ? "Dölj bilder" : "Hantera bilder"}
                 </button>
               </div>
+
+              {/* Edit-formulär */}
+              {editingJobId === job.id && (
+                <div className="mt-4 space-y-2">
+                  <input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="border p-2 w-full rounded"
+                  />
+
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    className="border p-2 w-full rounded"
+                    rows={4}
+                  />
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleUpdate}
+                      className="bg-green-600 px-4 py-2 rounded"
+                    >
+                      Spara
+                    </button>
+
+                    <button
+                      onClick={() => setEditingJobId(null)}
+                      className="bg-gray-500 px-4 py-2 rounded"
+                    >
+                      Avbryt
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Bildhantering */}
+              {expandedJobId === job.id && <JobImagesManager jobId={job.id} />}
             </div>
-          )}
-          <button
-            onClick={() => handleEdit(job.id, job.title, job.description ?? "")}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Redigera
-          </button>
-          <button
-            onClick={() => handleDelete(job.id)}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Ta bort
-          </button>
-          <button
-            onClick={() =>
-              setExpandedJobId(expandedJobId === job.id ? null : job.id)
-            }
-            className="bg-slate-700 text-white px-4 py-2 rounded"
-          >
-            {expandedJobId === job.id ? "Dölj bilder" : "Hantera bilder"}
-          </button>
-          {expandedJobId === job.id && <JobImagesManager jobId={job.id} />}
+          </div>
         </div>
       ))}
     </div>
