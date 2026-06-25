@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import JobImagesManager from "@/components/JobImagesManager";
 
 export default function AdminJobsList() {
   const [jobs, setJobs] = useState<any[]>([]);
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [editingJobId, setEditingJobId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -87,6 +89,7 @@ export default function AdminJobsList() {
 
             <p className="text-sm text-gray-600">{job.description}</p>
           </div>
+          {expandedJobId === job.id && <JobImagesManager jobId={job.id} />}
           {editingJobId === job.id && (
             <div className="mt-4 space-y-2">
               <input
@@ -130,6 +133,15 @@ export default function AdminJobsList() {
           >
             Ta bort
           </button>
+          <button
+            onClick={() =>
+              setExpandedJobId(expandedJobId === job.id ? null : job.id)
+            }
+            className="bg-slate-700 text-white px-4 py-2 rounded"
+          >
+            {expandedJobId === job.id ? "Dölj bilder" : "Hantera bilder"}
+          </button>
+          {expandedJobId === job.id && <JobImagesManager jobId={job.id} />}
         </div>
       ))}
     </div>
