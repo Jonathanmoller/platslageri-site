@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import AdminUpload from "@/components/AdminUpload";
 import AdminJobsList from "@/components/AdminJobsList";
+import AdminNav from "@/features/admin/components/AdminNav";
 
 export default async function Admin() {
   const supabase = await createClient();
@@ -22,7 +23,7 @@ export default async function Admin() {
           Hantera projekt, bilder och innehåll för hemsidan.
         </p>
       </div>
-
+      <AdminNav />
       <AdminUpload />
       <AdminJobsList />
     </div>
