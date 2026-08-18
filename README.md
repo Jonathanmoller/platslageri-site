@@ -61,9 +61,13 @@ Create a `.env.local` file in the project root:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+RESEND_API_KEY=your-resend-api-key
+CONTACT_EMAIL=company-notification-email
+RESEND_FROM=Company Name <contact@your-verified-domain.com>
 ```
 
 These values are available in Supabase under **Project Settings > API**.
+The Resend values are used server-side by the contact form notification email. `RESEND_FROM` must use a sender address from a verified Resend domain in production.
 
 ## Supabase Setup
 
